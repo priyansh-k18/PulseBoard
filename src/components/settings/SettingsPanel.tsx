@@ -1,6 +1,8 @@
 "use client";
 
+import { LanguageSelector } from "@/components/ui/LanguageSelector";
 import { ALL_CATEGORIES, CATEGORY_LABELS } from "@/lib/constants";
+import { getTranslation } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { contentApi } from "@/store/api/contentApi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -19,6 +21,7 @@ export function SettingsPanel() {
   const categories = useAppSelector((state) => state.preferences.categories);
   const displayName = useAppSelector((state) => state.preferences.displayName);
   const darkMode = useAppSelector((state) => state.ui.darkMode);
+  const language = useAppSelector((state) => state.ui.language || "en");
 
   const onToggleCategory = (category: ContentCategory) => {
     dispatch(toggleCategory(category));
@@ -120,6 +123,18 @@ export function SettingsPanel() {
               )}
             />
           </button>
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 sm:p-6">
+        <h3 className="font-[family-name:var(--font-display)] text-xl text-[var(--foreground)]">
+          {getTranslation(language, "language")}
+        </h3>
+        <p className="mt-1 text-sm text-[var(--muted)]">
+          {getTranslation(language, "languageDesc")}
+        </p>
+        <div className="mt-4">
+          <LanguageSelector />
         </div>
       </section>
 

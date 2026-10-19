@@ -1,11 +1,13 @@
 "use client";
 
+import { RealtimeBanner } from "@/components/feed/RealtimeBanner";
 import { SortableFeed } from "@/components/feed/SortableFeed";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { useGetFeedQuery } from "@/store/api/contentApi";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { syncOrderedIds } from "@/store/slices/feedSlice";
+import type { ContentItem } from "@/types/content";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -15,11 +17,16 @@ export function ContentFeed() {
   const searchQuery = useAppSelector((state) => state.ui.searchQuery);
   const orderedIds = useAppSelector((state) => state.feed.orderedIds);
   const [page, setPage] = useState(1);
+  const filterKey = `${categories.join(",")}-${searchQuery}`;
+  const [prevFilterKey, setPrevFilterKey] = useState(filterKey);
+  const [realtimeItems, setRealtimeItems] = useState<ContentItem[]>([]);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
+  if (filterKey !== prevFilterKey) {
+    setPrevFilterKey(filterKey);
     setPage(1);
-  }, [categories, searchQuery]);
+    setRealtimeItems([]);
+  }
 
   const { data, isLoading, isFetching, isError, error } = useGetFeedQuery({
     categories,
@@ -33,8 +40,20 @@ export function ContentFeed() {
     }
   }, [data?.items, dispatch]);
 
+  const handleInsertRealtimeItems = (newItems: ContentItem[]) => {
+    setRealtimeItems((prev) => [...newItems, ...prev]);
+    dispatch(syncOrderedIds([...newItems, ...(data?.items ?? [])]));
+  };
+
   const orderedItems = useMemo(() => {
-    const items = data?.items ?? [];
+    const rawItems = [...realtimeItems, ...(data?.items ?? [])];
+    const uniqueMap = new Map<string, ContentItem>();
+    for (const item of rawItems) {
+      if (!uniqueMap.has(item.id)) {
+        uniqueMap.set(item.id, item);
+      }
+    }
+    const items = Array.from(uniqueMap.values());
     if (!orderedIds.length) return items;
     const map = new Map(items.map((item) => [item.id, item]));
     const ordered = orderedIds
@@ -42,7 +61,7 @@ export function ContentFeed() {
       .filter(Boolean) as typeof items;
     const leftovers = items.filter((item) => !orderedIds.includes(item.id));
     return [...ordered, ...leftovers];
-  }, [data?.items, orderedIds]);
+  }, [data?.items, orderedIds, realtimeItems]);
 
   useEffect(() => {
     const node = loadMoreRef.current;
@@ -101,6 +120,8 @@ export function ContentFeed() {
           Drag cards by the handle to reorder your feed
         </p>
       </div>
+
+      <RealtimeBanner onInsertItems={handleInsertRealtimeItems} />
 
       <AnimatePresence mode="popLayout">
         <motion.div

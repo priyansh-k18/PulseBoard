@@ -1,5 +1,6 @@
 "use client";
 
+import { getTranslation } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setActiveSection, setSidebarOpen } from "@/store/slices/uiSlice";
@@ -15,20 +16,20 @@ import {
 
 const navItems: Array<{
   id: DashboardSection;
-  label: string;
   icon: typeof LayoutGrid;
 }> = [
-  { id: "feed", label: "Personalized Feed", icon: LayoutGrid },
-  { id: "trending", label: "Trending", icon: Flame },
-  { id: "favorites", label: "Favorites", icon: Heart },
-  { id: "settings", label: "Settings", icon: Settings2 },
+  { id: "feed", icon: LayoutGrid },
+  { id: "trending", icon: Flame },
+  { id: "favorites", icon: Heart },
+  { id: "settings", icon: Settings2 },
 ];
 
 export function Sidebar() {
   const dispatch = useAppDispatch();
   const activeSection = useAppSelector((state) => state.ui.activeSection);
   const sidebarOpen = useAppSelector((state) => state.ui.sidebarOpen);
-  const displayName = useAppSelector((state) => state.preferences.displayName);
+  const language = useAppSelector((state) => state.ui.language || "en");
+  const auth = useAppSelector((state) => state.auth);
   const categories = useAppSelector((state) => state.preferences.categories);
 
   return (
@@ -89,7 +90,7 @@ export function Sidebar() {
                 data-testid={`nav-${item.id}`}
               >
                 <Icon size={18} />
-                {item.label}
+                {getTranslation(language, item.id)}
               </button>
             );
           })}
@@ -97,13 +98,25 @@ export function Sidebar() {
 
         <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4">
           <p className="text-xs uppercase tracking-wide text-[var(--muted)]">
-            Signed in as
+            {getTranslation(language, "signedInAs")}
           </p>
-          <p className="mt-1 font-semibold text-[var(--foreground)]">
-            {displayName}
-          </p>
-          <p className="mt-2 text-xs text-[var(--muted)]">
-            Tracking {categories.length} categories
+          <div className="mt-1.5 flex items-center gap-2.5">
+            <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--accent-soft)] text-sm">
+              {auth.user.avatar || "👤"}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-[var(--foreground)]">
+                {auth.user.name}
+              </p>
+              <p className="truncate text-[11px] text-[var(--muted)]">
+                {auth.user.role}
+              </p>
+            </div>
+          </div>
+          <p className="mt-2.5 text-xs text-[var(--muted)]">
+            {getTranslation(language, "trackingCategories", {
+              count: categories.length,
+            })}
           </p>
         </div>
       </aside>
