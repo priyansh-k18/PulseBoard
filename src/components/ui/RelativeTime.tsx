@@ -1,14 +1,20 @@
 "use client";
 
 import { formatAbsoluteDate, formatRelativeTime } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+
+const emptySubscribe = () => () => {};
 
 export function RelativeTime({ isoDate }: { isoDate: string }) {
-  const [label, setLabel] = useState(() => formatAbsoluteDate(isoDate));
+  const isMounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false,
+  );
 
-  useEffect(() => {
-    setLabel(formatRelativeTime(isoDate));
-  }, [isoDate]);
+  const label = isMounted
+    ? formatRelativeTime(isoDate)
+    : formatAbsoluteDate(isoDate);
 
   return <time dateTime={isoDate}>{label}</time>;
 }

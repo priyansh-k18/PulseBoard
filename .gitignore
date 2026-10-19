@@ -17,8 +17,10 @@
 /blob-report
 
 # next.js
-/.next/
+.next/
+**/.next/
 /out/
+Intern/
 
 # production
 /build

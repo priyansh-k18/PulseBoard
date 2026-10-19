@@ -1,6 +1,8 @@
 import { DashboardShell } from "@/components/layout/DashboardShell";
 import { Suspense } from "react";
 
+export const instant = false;
+
 function DashboardFallback() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-[var(--background)] text-sm text-[var(--muted)]">
