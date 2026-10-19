@@ -1,11 +1,14 @@
 import type { DashboardSection } from "@/types/content";
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 
+export type AppLanguage = "en" | "es" | "fr";
+
 export interface UiState {
   darkMode: boolean;
   activeSection: DashboardSection;
   searchQuery: string;
   sidebarOpen: boolean;
+  language: AppLanguage;
 }
 
 const initialState: UiState = {
@@ -13,6 +16,7 @@ const initialState: UiState = {
   activeSection: "feed",
   searchQuery: "",
   sidebarOpen: false,
+  language: "en",
 };
 
 const uiSlice = createSlice({
@@ -35,6 +39,9 @@ const uiSlice = createSlice({
     setSidebarOpen(state, action: PayloadAction<boolean>) {
       state.sidebarOpen = action.payload;
     },
+    setLanguage(state, action: PayloadAction<AppLanguage>) {
+      state.language = action.payload;
+    },
   },
 });
 
@@ -44,6 +51,7 @@ export const {
   setActiveSection,
   setSearchQuery,
   setSidebarOpen,
+  setLanguage,
 } = uiSlice.actions;
 
 export default uiSlice.reducer;
