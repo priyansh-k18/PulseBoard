@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f3f6f8;
+  --foreground: #12202b;
+  --muted: #5b6b76;
+  --surface: #ffffff;
+  --surface-muted: #e8eef2;
+  --sidebar: #eef4f7;
+  --header: #f3f6f8;
+  --border: #d5e0e7;
+  --accent: #0f7c86;
+  --accent-soft: #d7f0f2;
+  --accent-contrast: #ffffff;
+  --shadow: 0 10px 30px rgba(18, 32, 43, 0.06);
+  --bg-glow-a: rgba(15, 124, 134, 0.12);
+  --bg-glow-b: rgba(214, 145, 58, 0.1);
+}
+
+.dark,
+[data-theme="dark"] {
+  --background: #0b141a;
+  --foreground: #e8f0f4;
+  --muted: #9aadb8;
+  --surface: #122029;
+  --surface-muted: #1a2c37;
+  --sidebar: #0f1a21;
+  --header: #0b141a;
+  --border: #243845;
+  --accent: #3ec4cf;
+  --accent-soft: #16353a;
+  --accent-contrast: #062226;
+  --shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+  --bg-glow-a: rgba(62, 196, 207, 0.12);
+  --bg-glow-b: rgba(214, 145, 58, 0.08);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 500px at 10% -10%, var(--bg-glow-a), transparent 55%),
+    radial-gradient(900px 420px at 90% 0%, var(--bg-glow-b), transparent 50%),
+    var(--background);
+  color: var(--foreground);
+  font-family: var(--font-body), "Segoe UI", sans-serif;
+}
+
+button,
+input,
+a {
+  font: inherit;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+}
