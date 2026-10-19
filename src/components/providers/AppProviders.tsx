@@ -1,18 +1,28 @@
 "use client";
 
 import { makeStore } from "@/store";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 
-export function AppProviders({ children }: { children: React.ReactNode }) {
-  const [bundle, setBundle] = useState<ReturnType<typeof makeStore> | null>(
-    null,
-  );
+const emptySubscribe = () => () => {};
 
-  useEffect(() => {
-    setBundle(makeStore());
-  }, []);
+let clientBundle: ReturnType<typeof makeStore> | null = null;
+
+function getClientBundle() {
+  if (typeof window === "undefined") return null;
+  if (!clientBundle) {
+    clientBundle = makeStore();
+  }
+  return clientBundle;
+}
+
+export function AppProviders({ children }: { children: React.ReactNode }) {
+  const bundle = useSyncExternalStore(
+    emptySubscribe,
+    getClientBundle,
+    () => null,
+  );
 
   if (!bundle) {
     return (

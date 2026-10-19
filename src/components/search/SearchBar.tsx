@@ -1,6 +1,7 @@
 "use client";
 
 import { useDebounce } from "@/hooks/useDebounce";
+import { getTranslation } from "@/lib/i18n";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setSearchQuery } from "@/store/slices/uiSlice";
 import { Search, X } from "lucide-react";
@@ -9,12 +10,16 @@ import { useEffect, useState } from "react";
 export function SearchBar() {
   const dispatch = useAppDispatch();
   const storedQuery = useAppSelector((state) => state.ui.searchQuery);
+  const language = useAppSelector((state) => state.ui.language || "en");
   const [value, setValue] = useState(storedQuery);
-  const debounced = useDebounce(value, 400);
+  const [prevStoredQuery, setPrevStoredQuery] = useState(storedQuery);
 
-  useEffect(() => {
+  if (storedQuery !== prevStoredQuery) {
+    setPrevStoredQuery(storedQuery);
     setValue(storedQuery);
-  }, [storedQuery]);
+  }
+
+  const debounced = useDebounce(value, 400);
 
   useEffect(() => {
     if (debounced !== storedQuery) {
@@ -32,7 +37,7 @@ export function SearchBar() {
         type="search"
         value={value}
         onChange={(event) => setValue(event.target.value)}
-        placeholder="Search news, movies, or posts…"
+        placeholder={getTranslation(language, "searchPlaceholder")}
         className="h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--surface)] pl-10 pr-10 text-sm text-[var(--foreground)] outline-none transition placeholder:text-[var(--muted)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/25"
         aria-label="Search content"
         data-testid="search-input"
